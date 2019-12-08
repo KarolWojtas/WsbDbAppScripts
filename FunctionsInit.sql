@@ -57,11 +57,11 @@ END
 GO
 DROP FUNCTION CALC_BASE_PREMIUM
 GO
--- Calculates base premium based on frequency, insurance period and sum insured, without commission
-CREATE FUNCTION CALC_BASE_PREMIUM(@insurancePeriod int, @su money, @frequency int)
+-- Calculates base premium based on frequency, insurance period and sum insured, without commission, precision 4 decimal
+CREATE FUNCTION CALC_BASE_PREMIUM(@su money, @insurancePeriod int, @frequency int)
 RETURNS MONEY
 BEGIN
-    RETURN @su / (@insurancePeriod * @frequency)
+    RETURN @su / (@insurancePeriod * @frequency);
 END
 GO
 -- TODO LifeRiskType
@@ -76,5 +76,5 @@ RETURNS MONEY
 BEGIN
     DECLARE @age int;
     SET @age = DATEDIFF(YEAR, dbo.BIRTHDATE_FROM_PESEL(@pesel), GETDATE());
-    RETURN 0.0
+    RETURN dbo.CALC_BASE_PREMIUM(@su, @insurancePeriod, @frequency);
 END
