@@ -64,10 +64,6 @@ BEGIN
     RETURN @su / (@insurancePeriod * @frequency);
 END
 GO
--- TODO LifeRiskType
-CREATE TYPE LifeRiskType AS TABLE
-(pesel VARCHAR,  frequency int, insurancePeriod int, su money, hazardousOccupation bit)
-GO
 -- CalcLifePremium IMPORTANT you have to add DEFAULT keyword for params with default values (frequency)
 DROP FUNCTION CALC_LIFE_PREMIUM
 GO
@@ -78,3 +74,4 @@ BEGIN
     SET @age = DATEDIFF(YEAR, dbo.BIRTHDATE_FROM_PESEL(@pesel), GETDATE());
     RETURN dbo.CALC_BASE_PREMIUM(@su, @insurancePeriod, @frequency);
 END
+GO
