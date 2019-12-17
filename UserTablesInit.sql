@@ -1,3 +1,7 @@
+USE InsuranceCompany;
+
+DELETE FROM InsuranceCompany.dbo.LifeRisk;
+DELETE FROM InsuranceCompany.dbo.[Policy];
 delete from InsuranceCompany.dbo.[User];
 delete from InsuranceCompany.dbo.Character;
 
@@ -15,4 +19,41 @@ values
 
 insert into InsuranceCompany.dbo.[User] (FirstName, LastName, PESEL)
 values 
-('Henryk', 'Sliczny', '16261656791');
+('Henryk', 'Sliczny', '16261656791'),
+('Jan', 'Gonzalez', '01290544379');
+
+-- Policies
+INSERT INTO InsuranceCompany.dbo.Policy (Premium, Client_ID, Agent_ID, StartDate, EndDate, Approved)
+VALUES
+(
+    0,
+    (select top 1 ID from InsuranceCompany.dbo.[User] where Character_ID = 'CLIENT' ORDER BY PESEL ASC),
+    (select top 1 ID from InsuranceCompany.dbo.[User] where Character_ID = 'AGENT'),
+    GETDATE(),
+    DATEADD(YEAR, 1, GETDATE()),
+    0
+),
+(
+    0,
+    (select top 1 ID from InsuranceCompany.dbo.[User] where Character_ID = 'CLIENT'  ORDER BY PESEL DESC),
+    (select top 1 ID from InsuranceCompany.dbo.[User] where Character_ID = 'AGENT'),
+    GETDATE(),
+    DATEADD(YEAR, 1, GETDATE()),
+    0
+);
+
+-- LifeRisk
+INSERT INTO LifeRisk (SU, Premium, HazardousOccupation, Policy_ID)
+VALUES
+(
+    10000,
+    0,
+    0,
+    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID ASC)
+),
+(
+    10000,
+    0,
+    0,
+    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC)
+);
