@@ -19,8 +19,8 @@ values
 
 insert into InsuranceCompany.dbo.[User] (FirstName, LastName, PESEL)
 values 
-('Henryk', 'Sliczny', '16261656791'),
-('Jan', 'Gonzalez', '01290544379');
+('Henryk', 'Sliczny', '97012909216'),
+('Jan', 'Gonzalez', '90052582432');
 
 -- Policies
 INSERT INTO InsuranceCompany.dbo.Policy (Premium, Client_ID, Agent_ID, StartDate, EndDate, Approved)
@@ -38,7 +38,7 @@ VALUES
     (select top 1 ID from InsuranceCompany.dbo.[User] where Character_ID = 'CLIENT'  ORDER BY PESEL DESC),
     (select top 1 ID from InsuranceCompany.dbo.[User] where Character_ID = 'AGENT'),
     GETDATE(),
-    DATEADD(YEAR, 1, GETDATE()),
+    DATEADD(YEAR, 5, GETDATE()),
     0
 );
 
@@ -52,8 +52,8 @@ VALUES
     (SELECT TOP 1 ID FROM [Policy] ORDER BY ID ASC)
 ),
 (
-    10000,
+    35000,
     0,
-    0,
+    1,
     (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC)
 );

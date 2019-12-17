@@ -9,29 +9,21 @@ ON LifeRisk
 AFTER INSERT, UPDATE
 AS 
 BEGIN
-    -- DECLARE @pesel VARCHAR(11), @insPeriod int, @su money, @hazOcc bit, @freq int, @id bigint;
-    -- -- TODO get age from pesel from policy from person LOOOOOL
-    -- SET @pesel = '94081832195';
-    -- SELECT @su = FIRST_VALUE(SU) OVER (ORDER BY ID) FROM inserted;
-    -- -- TODO
-    -- SET @insPeriod = 10;
-    -- SELECT @hazOcc = FIRST_VALUE(HazardousOccupation) OVER (ORDER BY ID) FROM inserted;
-    -- SET @freq = 12;
-    -- SELECT @id = FIRST_VALUE(ID) OVER (ORDER BY ID) FROM inserted;
-    -- UPDATE LifeRisk 
-    -- SET Premium = InsuranceCompany.dbo.CALC_LIFE_PREMIUM(@pesel, @insPeriod, @su, @hazOcc, @freq)
-    -- WHERE ID = @id
     UPDATE LifeRisk 
     SET Premium = InsuranceCompany.dbo.CALC_LIFE_PREMIUM(
-        '94081832195',
-        InsuranceCompany.dbo.RANDOM_NUMBER(10, 20),
+        [User].PESEL,
+        DATEDIFF(YEAR, [Policy].StartDate, [Policy].EndDate),
         inserted.SU,
-        0, 
-        12
+        inserted.HazardousOccupation, 
+        DEFAULT
         )
     FROM LifeRisk
     LEFT OUTER JOIN inserted
     ON LifeRisk.ID = inserted.ID
+    LEFT OUTER JOIN [Policy]
+    ON [Policy].ID = inserted.ID
+    LEFT OUTER JOIN [User]
+    ON [User].ID = [Policy].Client_ID
 END
 GO
--- TODO TEST THIS ^^^
+-- TODO fix birthdate to text conversion
