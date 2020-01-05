@@ -24,6 +24,8 @@ BEGIN
     ON [Policy].ID = inserted.ID
     LEFT OUTER JOIN [User]
     ON [User].ID = [Policy].Client_ID
+    -- tutaj dodać WHERE LifeRisk.ID IN (SELECT ID FROM inserted)
+    -- żeby ograniczyć rekordy aktualizowane, bez tego są wszystkie chyba
 END
 GO
 -- TODO fix birthdate to text conversion
