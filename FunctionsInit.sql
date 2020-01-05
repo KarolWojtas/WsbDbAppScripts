@@ -47,7 +47,7 @@ BEGIN
         SET @year = CONCAT('19', @yearNumber);
     ELSE 
         SET @year = CONCAT('20', @yearNumber);
-
+    -- pesel po 2000 do miesiąca dodaje się 20 np. maj = 25
     SET @month = SUBSTRING(@pesel, 3, 2);
     SET @day = SUBSTRING(@pesel, 5, 2);
     DECLARE @resultStr VARCHAR(20);
