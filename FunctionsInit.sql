@@ -39,19 +39,22 @@ GO
 CREATE FUNCTION BIRTHDATE_FROM_PESEL(@pesel VARCHAR(11))
 RETURNS DATE
 BEGIN
-    DECLARE @yearNumber int, @year VARCHAR(4), @month VARCHAR(2), @day VARCHAR(2);
-    DECLARE @currentYear int;
-    SET @currentYear = YEAR(GETDATE()) - 2000;
-    SET @yearNumber = CAST(SUBSTRING(@pesel, 1, 2) AS INT);
-    IF @currentYear - @yearNumber < 0
-        SET @year = CONCAT('19', @yearNumber);
+    DECLARE @yearPref VARCHAR(2), @monthNum INT, @yearStr VARCHAR(4), @monthStr VARCHAR(2), @dayStr VARCHAR(2);
+    SET @monthNum = CAST(SUBSTRING(@pesel, 3, 2) AS INT);
+    IF @monthNum > 12
+        BEGIN
+            SET @yearPref = '20';
+            SET @monthStr = CAST(@monthNum - 20 as varchar(2));
+        END
     ELSE 
-        SET @year = CONCAT('20', @yearNumber);
-    -- pesel po 2000 do miesiąca dodaje się 20 np. maj = 25
-    SET @month = SUBSTRING(@pesel, 3, 2);
-    SET @day = SUBSTRING(@pesel, 5, 2);
+        BEGIN
+            SET @yearPref = '19';
+            SET @monthStr = CAST(@monthNum as varchar(2));
+        END
+    SET @dayStr = SUBSTRING(@pesel, 5, 2);
+    SET @yearStr = CONCAT(@yearPref, SUBSTRING(@pesel, 1, 2));
     DECLARE @resultStr VARCHAR(20);
-    SET @resultStr = CONCAT_WS('/', @month, @day, @year);
+    SET @resultStr = CONCAT_WS('/', @monthStr, @dayStr, @yearStr);
     RETURN CAST( @resultStr AS DATE);
 END
 GO
