@@ -14,12 +14,12 @@ values ('CENTRAL', 'Centrala'), ('CLIENT', 'Klient'), ('AGENT', 'Agent');
 
 insert into InsuranceCompany.dbo.[User] (FirstName, LastName, PESEL, Character_ID)
 values 
-('Karol', 'Wojtas', '91062364630', 'CENTRAL'),
-('Magdalena', 'Dobska', '91033116363', 'AGENT');
+('Karol', 'Wojtyła', '91062364630', 'CENTRAL'),
+('Magdalena', 'Dulek', '91033116363', 'AGENT');
 
 insert into InsuranceCompany.dbo.[User] (FirstName, LastName, PESEL)
 values 
-('Henryk', 'Sliczny', '97012909216'),
+('Henryk', 'Ślimak', '97012909216'),
 ('Jan', 'Gonzalez', '90052582432');
 
 -- Policies

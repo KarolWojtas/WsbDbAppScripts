@@ -78,3 +78,34 @@ BEGIN
     RETURN dbo.CALC_BASE_PREMIUM(@su, @insurancePeriod, @frequency);
 END
 GO
+-- CalcHousePremium
+DROP FUNCTION CALC_HOUSE_PREMIUM
+GO
+CREATE FUNCTION CALC_HOUSE_PREMIUM(@insurancePeriod int, @fireSu money, @floodSu money,  @floorNumber smallint = 1, @floorTotal smallint = 1, @detached bit = 0, @frequency int = 12)
+RETURNS MONEY
+BEGIN
+    DECLARE @totalSu money;
+    -- detached house
+    IF @detached = 1
+        BEGIN
+            SET @totalSu = @fireSu + @floodSu;
+        END
+    -- flat
+    ELSE
+        BEGIN
+            SET @totalSu = @fireSu + @floodSu;
+        END
+    RETURN dbo.CALC_BASE_PREMIUM(@totalSu, @insurancePeriod, @frequency);
+END
+GO
+-- CalcVehiclePremium
+DROP FUNCTION CALC_VEHICLE_PREMIUM
+GO
+CREATE FUNCTION CALC_VEHICLE_PREMIUM(@pesel VARCHAR(11), @insurancePeriod int, @su money, @vehicleModelId bigint, @mileage int, @frequency int = 12)
+RETURNS MONEY
+BEGIN
+    DECLARE @age int;
+    SET @age = DATEDIFF(YEAR, dbo.BIRTHDATE_FROM_PESEL(@pesel), GETDATE());
+    RETURN dbo.CALC_BASE_PREMIUM(@su, @insurancePeriod, @frequency);
+END
+GO
