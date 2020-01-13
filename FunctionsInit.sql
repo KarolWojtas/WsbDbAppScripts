@@ -29,10 +29,6 @@ BEGIN
     RETURN CAST( CONCAT('1/1/', @numberYear) as [date])
 END
 GO
--- LifeRiskType
-CREATE TYPE LifeRisk AS TABLE
-(pesel VARCHAR(11))
-GO
 -- BirthDateFromPesel
 DROP FUNCTION BIRTHDATE_FROM_PESEL
 GO
@@ -73,28 +69,31 @@ GO
 CREATE FUNCTION CALC_LIFE_PREMIUM(@pesel VARCHAR(11), @insurancePeriod int, @su money, @hazardousOccupation bit, @frequency int = 12)
 RETURNS MONEY
 BEGIN
-    DECLARE @age int;
+    DECLARE @age int, @basePremium money, @additionalPremium money;
     SET @age = DATEDIFF(YEAR, dbo.BIRTHDATE_FROM_PESEL(@pesel), GETDATE());
-    RETURN dbo.CALC_BASE_PREMIUM(@su, @insurancePeriod, @frequency);
+    SET @basePremium = dbo.CALC_BASE_PREMIUM(@su, @insurancePeriod, @frequency);
+    SET @additionalPremium = 0;
+    IF @hazardousOccupation = 1
+        SET @additionalPremium = @additionalPremium + (0.1 * @basePremium);
+    IF @age > 50
+        SET @additionalPremium = @additionalPremium + ((@age - 50) / 100 * @basePremium);
+    RETURN (@basePremium + @additionalPremium);
 END
 GO
 -- CalcHousePremium
 DROP FUNCTION CALC_HOUSE_PREMIUM
 GO
-CREATE FUNCTION CALC_HOUSE_PREMIUM(@insurancePeriod int, @fireSu money, @floodSu money,  @floorNumber smallint = 1, @floorTotal smallint = 1, @detached bit = 0, @frequency int = 12)
+CREATE FUNCTION CALC_HOUSE_PREMIUM(@insurancePeriod int, @fireSu money, @floodSu money,  @floorNumber smallint = 1, 
+    @floorTotal smallint = 1, @detached bit = 0, @frequency int = 12)
 RETURNS MONEY
 BEGIN
-    DECLARE @totalSu money;
+    DECLARE @totalSu money = 0;
     -- detached house
     IF @detached = 1
-        BEGIN
-            SET @totalSu = @fireSu + @floodSu;
-        END
+        SET @totalSu = @fireSu + @floodSu + (0.02 * @fireSu * @floorTotal);
     -- flat
     ELSE
-        BEGIN
-            SET @totalSu = @fireSu + @floodSu;
-        END
+        SET @totalSu = @fireSu + @floodSu + (@floorNumber / @floorTotal * @fireSu * 0.2) + ((1 - (@floorNumber / @floorTotal) * 0.2 * @floodSu));
     RETURN dbo.CALC_BASE_PREMIUM(@totalSu, @insurancePeriod, @frequency);
 END
 GO
@@ -104,8 +103,12 @@ GO
 CREATE FUNCTION CALC_VEHICLE_PREMIUM(@pesel VARCHAR(11), @insurancePeriod int, @su money, @vehicleModelId bigint, @mileage int, @frequency int = 12)
 RETURNS MONEY
 BEGIN
-    DECLARE @age int;
+    DECLARE @age int, @vehicleAge int, @additionalPremium money = 0;
+    SET @vehicleAge = DATEDIFF(YEAR, (SELECT Year FROM VehicleModel WHERE ID = @vehicleModelId), GETDATE());
     SET @age = DATEDIFF(YEAR, dbo.BIRTHDATE_FROM_PESEL(@pesel), GETDATE());
-    RETURN dbo.CALC_BASE_PREMIUM(@su, @insurancePeriod, @frequency);
+    IF @age < 25
+        SET @additionalPremium = 0.5 * ((25 - @age) * 0.1) * @su;
+    SET @additionalPremium = @additionalPremium + @su * 0.01 * @vehicleAge;
+    RETURN dbo.CALC_BASE_PREMIUM(@su + @additionalPremium, @insurancePeriod, @frequency);
 END
 GO

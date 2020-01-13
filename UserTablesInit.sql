@@ -1,6 +1,8 @@
 USE InsuranceCompany;
 
 DELETE FROM InsuranceCompany.dbo.LifeRisk;
+delete from dbo.HouseRisk;
+delete from dbo.VehicleRisk;
 DELETE FROM InsuranceCompany.dbo.[Policy];
 delete from InsuranceCompany.dbo.[User];
 delete from InsuranceCompany.dbo.Character;
@@ -56,4 +58,27 @@ VALUES
     0,
     1,
     (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC)
+);
+-- HouseRisk
+INSERT INTO HouseRisk (Fire_SU, Premium, FloorNumber, FloorTotal, Detached, Flood_SU, Policy_ID, Code)
+VALUES
+(
+    5000,
+    0,
+    2,
+    10,
+    0,
+    10000,
+    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID ASC),
+    '123'
+),
+(
+    7500,
+    0,
+    1,
+    5,
+    1,
+    20000,
+    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC),
+    '123'
 );

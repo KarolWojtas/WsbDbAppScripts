@@ -38,8 +38,9 @@ AFTER INSERT, UPDATE
 AS 
 BEGIN
     UPDATE HouseRisk 
+    -- todo cos z ins period nie tak
     SET Premium = InsuranceCompany.dbo.CALC_HOUSE_PREMIUM(
-        DATEDIFF(YEAR, [Policy].StartDate, [Policy].EndDate),
+        DATEDIFF(YEAR, p.StartDate, p.EndDate),
         inserted.Fire_SU,
         inserted.Flood_SU,
         inserted.FloorNumber,
@@ -50,8 +51,8 @@ BEGIN
     FROM HouseRisk
     LEFT OUTER JOIN inserted
     ON HouseRisk.ID = inserted.ID
-    LEFT OUTER JOIN [Policy]
-    ON [Policy].ID = inserted.ID
+    LEFT OUTER JOIN [Policy] p
+    ON p.ID = inserted.Policy_ID
     WHERE HouseRisk.ID IN (SELECT ID FROM inserted)
 END
 GO
@@ -77,7 +78,7 @@ BEGIN
     LEFT OUTER JOIN inserted
     ON VehicleRisk.ID = inserted.ID
     LEFT OUTER JOIN [Policy]
-    ON [Policy].ID = inserted.ID
+    ON [Policy].ID = inserted.Policy_ID
     LEFT OUTER JOIN [User]
     ON [User].ID = [Policy].Client_ID
     WHERE VehicleRisk.ID IN (SELECT ID FROM inserted)
