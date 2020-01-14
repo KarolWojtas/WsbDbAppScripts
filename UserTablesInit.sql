@@ -6,9 +6,17 @@ delete from dbo.VehicleRisk;
 DELETE FROM InsuranceCompany.dbo.[Policy];
 delete from InsuranceCompany.dbo.[User];
 delete from InsuranceCompany.dbo.Character;
+delete from InsuranceCompany.dbo.TaskStatus;
 
 insert into InsuranceCompany.dbo.Character (Code, Description) 
 values ('CENTRAL', 'Centrala'), ('CLIENT', 'Klient'), ('AGENT', 'Agent');
+
+INSERT INTO InsuranceCompany.dbo.TaskStatus (ID, Description)
+VALUES 
+('SENT_TO_APPROVAL', 'Wysłane do akceptacji'),
+('APPROVED', 'Zatwierdzone'),
+('SENT_TO_CLIENT', 'Wysłane do klienta'), 
+('NOT_APPROVED', 'Nie zaakceptowane');
 
 -- wybieram pierwszy character
 -- declare @centralCharacter bigint;
@@ -60,7 +68,7 @@ VALUES
     (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC)
 );
 -- HouseRisk
-INSERT INTO HouseRisk (Fire_SU, Premium, FloorNumber, FloorTotal, Detached, Flood_SU, Policy_ID, Code)
+INSERT INTO HouseRisk (Fire_SU, Premium, FloorNumber, FloorTotal, Detached, Flood_SU, Policy_ID)
 VALUES
 (
     5000,
@@ -69,8 +77,7 @@ VALUES
     10,
     0,
     10000,
-    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID ASC),
-    '123'
+    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID ASC)
 ),
 (
     7500,
@@ -79,6 +86,5 @@ VALUES
     5,
     1,
     20000,
-    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC),
-    '123'
+    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC)
 );
