@@ -1,6 +1,6 @@
 USE InsuranceCompany;
 GO
-
+-- VIEWS
 -- Random Number - cannot use RAND() inside functions directly, move later to VehicleTablesInit.sql
 DROP VIEW RANDOM_NUMBER_VIEW
 GO
@@ -8,7 +8,18 @@ CREATE VIEW RANDOM_NUMBER_VIEW
 AS
 SELECT RAND() AS RANDOM_NUMBER;
 GO
+DROP VIEW CENTRAL_TASKS
+GO
+-- Central user id and number of tasks he/she is assigned to
+CREATE VIEW CENTRAL_TASKS
+AS
+    SELECT u.ID as Central_ID, COUNT(t.ID) as NumberOfTasks FROM [User] u
+    LEFT JOIN [Task] t ON u.ID = t.Operator_ID
+    WHERE u.Character_ID = 'CENTRAL'
+    GROUP BY u.ID
+GO
 
+-- FUNCTIONS
 -- RandomNumber
 DROP FUNCTION RANDOM_NUMBER
 GO
@@ -110,5 +121,20 @@ BEGIN
         SET @additionalPremium = 0.5 * ((25 - @age) * 0.1) * @su;
     SET @additionalPremium = @additionalPremium + @su * 0.01 * @vehicleAge;
     RETURN dbo.CALC_BASE_PREMIUM(@su + @additionalPremium, @insurancePeriod, @frequency);
+END
+GO
+-- returns random Central user id with least tasks assigned
+DROP FUNCTION LEAST_BUSY_CENTRAL
+GO
+CREATE FUNCTION LEAST_BUSY_CENTRAL()
+RETURNS bigint
+BEGIN
+    DECLARE @minTaskNumber int = (SELECT MIN(NumberOfTasks) FROM CENTRAL_TASKS);
+    DECLARE @randomCentralId int;
+    SET @randomCentralId = (
+        SELECT TOP 1 Central_ID FROM CENTRAL_TASKS 
+        WHERE NumberOfTasks = @minTaskNumber);
+        -- todo maybe random but it is tricky
+    RETURN @randomCentralId;
 END
 GO

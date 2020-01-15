@@ -20,7 +20,7 @@ BEGIN
     -- create task
     INSERT INTO [Task] (Policy_ID, Originator_ID, Operator_ID, Status_ID)
     (
-        SELECT @policyId, Agent_ID, 1, 'SENT_TO_APPROVAL' FROM [Policy]
+        SELECT @policyId, Agent_ID, dbo.LEAST_BUSY_CENTRAL(), 'SENT_TO_APPROVAL' FROM [Policy]
         WHERE [Policy].ID = @policyId
     );
 END

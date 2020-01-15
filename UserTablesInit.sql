@@ -3,9 +3,11 @@ USE InsuranceCompany;
 DELETE FROM InsuranceCompany.dbo.LifeRisk;
 delete from dbo.HouseRisk;
 delete from dbo.VehicleRisk;
+delete from InsuranceCompany.dbo.Task;
 DELETE FROM InsuranceCompany.dbo.[Policy];
 delete from InsuranceCompany.dbo.[User];
 delete from InsuranceCompany.dbo.Character;
+delete from InsuranceCompany.dbo.Task;
 delete from InsuranceCompany.dbo.TaskStatus;
 
 insert into InsuranceCompany.dbo.Character (Code, Description) 
@@ -25,6 +27,7 @@ VALUES
 insert into InsuranceCompany.dbo.[User] (FirstName, LastName, PESEL, Character_ID)
 values 
 ('Karol', 'Wojtyła', '91062364630', 'CENTRAL'),
+('Zbigniew', 'Stonoga', '74021249618', 'CENTRAL'),
 ('Magdalena', 'Dulek', '91033116363', 'AGENT');
 
 insert into InsuranceCompany.dbo.[User] (FirstName, LastName, PESEL)
