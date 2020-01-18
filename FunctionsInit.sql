@@ -1,6 +1,6 @@
 USE InsuranceCompany;
 GO
--- VIEWS
+-- VIEWS used by functions declared in this file
 -- Random Number - cannot use RAND() inside functions directly, move later to VehicleTablesInit.sql
 DROP VIEW RANDOM_NUMBER_VIEW
 GO
