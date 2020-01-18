@@ -53,6 +53,14 @@ VALUES
     GETDATE(),
     DATEADD(YEAR, 5, GETDATE()),
     0
+), 
+(
+    0,
+    (select top 1 ID from InsuranceCompany.dbo.[User] where Character_ID = 'CLIENT'  ORDER BY PESEL DESC),
+    (select top 1 ID from InsuranceCompany.dbo.[User] where Character_ID = 'AGENT'),
+    GETDATE(),
+    DATEADD(YEAR, 5, GETDATE()),
+    0
 );
 
 -- LifeRisk
@@ -89,5 +97,22 @@ VALUES
     5,
     1,
     20000,
+    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC)
+);
+-- VehicleRisk
+INSERT INTO VehicleRisk (SU, Premium, VehicleModel_ID, Mileage, Policy_ID)
+VALUES
+(
+    3000,
+    0,
+    50,
+    250000,
+    (SELECT TOP 1 ID FROM [Policy] ORDER BY ID ASC)
+),
+(
+    4000,
+    0,
+    50,
+    100000,
     (SELECT TOP 1 ID FROM [Policy] ORDER BY ID DESC)
 );
