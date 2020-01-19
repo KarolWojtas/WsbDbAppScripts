@@ -126,8 +126,10 @@ BEGIN
         SET @horsepowerMultiplier = 0.02
     ELSE 
         SET @horsepowerMultiplier = 0.03
-    SET @additionalPremium = @additionalPremium + (@su * 0.01 * @vehicleAge);
-    SET @additionalPremium = @additionalPremium + (@su * @horsepowerMultiplier);
+    SET @additionalPremium = @additionalPremium + (@su * 0.01 * @vehicleAge); -- client age 
+    SET @additionalPremium = @additionalPremium + (@su * @horsepowerMultiplier); -- horsepower
+    IF @mileage > 100000
+        SET @additionalPremium = @additionalPremium + (@mileage / 5000000 * @su) -- mileage
     RETURN dbo.CALC_BASE_PREMIUM(@su + @additionalPremium, @insurancePeriod, @frequency);
 END
 GO

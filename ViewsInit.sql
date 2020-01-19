@@ -5,13 +5,12 @@ GO
 -- Summary of Client Policies which were offered (status 'SENT_TO_CLIENT') and their insurance period is active
 CREATE VIEW ACTIVE_CLIENT_POLICIES
 AS
-    SELECT u.ID, u.FirstName, u.LastName, u.PESEL, 
+    SELECT u.ID ClientID, u.FirstName, u.LastName, u.PESEL, 
         DATEDIFF(YEAR, dbo.BIRTHDATE_FROM_PESEL(u.PESEL), GETDATE()) as Age,
         COUNT(p.ID) as NumberOfPolicies,
-        SUM(p.Premium) as TotalPremium,
+        SUM(p.Premium) as ActivePoliciesPremium,
         COUNT(vr.ID) NumberOfVehiclesInsured,
-        COUNT(hr.ID) NumberOfHousesInsured,
-        t.Status_ID as Status
+        COUNT(hr.ID) NumberOfHousesInsured
     FROM Task t
     LEFT JOIN [Policy] p ON t.Policy_ID = p.ID
     LEFT JOIN [User] u ON u.ID = p.Client_ID
@@ -25,11 +24,14 @@ DROP VIEW AGENT_TASK_SUMMARY
 GO
 CREATE VIEW AGENT_TASK_SUMMARY
 AS
-    SELECT u.FirstName AgentFirstName, u.LastName AgentLastName, t.Status_ID,
-        c.PESEL, c.FirstName + ' ' + c.LastName ClientName, p.Premium
+    SELECT a.FirstName + ' ' + a.LastName OriginatorName, 
+        t.Status_ID, t.UpdateDatetime,
+        o.FirstName + ' ' + o.LastName OperatorName,
+        c.PESEL ClientPesel, c.FirstName + ' ' + c.LastName ClientName, p.Premium
     FROM Task t
     LEFT JOIN [Policy] p ON t.Policy_ID = p.ID
-    LEFT JOIN [User] u ON t.Operator_ID = u.ID
+    LEFT JOIN [User] a ON t.Originator_ID = a.ID
+    LEFT JOIN [User] o ON t.Operator_ID = o.ID
     LEFT JOIN [User] c ON p.Client_ID = c.ID
-    WHERE u.Character_ID = 'AGENT'
+    WHERE a.Character_ID = 'AGENT'
 GO

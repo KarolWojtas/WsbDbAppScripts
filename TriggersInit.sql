@@ -84,4 +84,15 @@ BEGIN
     WHERE VehicleRisk.ID IN (SELECT ID FROM inserted)
 END
 GO
-
+DROP TRIGGER TASK_UPDATE
+GO
+-- This trigger chages datetime of last update on given task
+CREATE TRIGGER TASK_UPDATE
+ON Task
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    UPDATE Task
+    SET UpdateDatetime = GETDATE()
+    WHERE Task.ID IN (SELECT ID FROM inserted)
+END
