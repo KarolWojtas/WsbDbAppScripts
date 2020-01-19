@@ -1,9 +1,9 @@
 USE InsuranceCompany
 GO
-DROP VIEW SENT_TO_CLIENT_SUMMARY
+DROP VIEW ACTIVE_CLIENT_POLICIES
 GO
--- table with finished policies of given clients
-CREATE VIEW SENT_TO_CLIENT_SUMMARY
+-- Summary of Client Policies which were offered (status 'SENT_TO_CLIENT') and their insurance period is active
+CREATE VIEW ACTIVE_CLIENT_POLICIES
 AS
     SELECT u.ID, u.FirstName, u.LastName, u.PESEL, 
         DATEDIFF(YEAR, dbo.BIRTHDATE_FROM_PESEL(u.PESEL), GETDATE()) as Age,
@@ -17,16 +17,19 @@ AS
     LEFT JOIN [User] u ON u.ID = p.Client_ID
     LEFT JOIN HouseRisk hr ON p.ID = hr.Policy_ID
     LEFT JOIN VehicleRisk vr ON p.ID = vr.Policy_ID
-    WHERE u.Character_ID = 'CLIENT'
+    WHERE u.Character_ID = 'CLIENT' AND GETDATE() BETWEEN p.StartDate AND p.EndDate
     GROUP BY t.Status_ID, u.ID, u.FirstName, u.LastName, u.PESEL
     HAVING t.Status_ID = 'SENT_TO_CLIENT';
 GO
-DROP VIEW AGENT_SUMMARY
+DROP VIEW AGENT_TASK_SUMMARY
 GO
-CREATE VIEW AGENT_SUMMARY
+CREATE VIEW AGENT_TASK_SUMMARY
 AS
-    SELECT u.ID, u.FirstName, u.LastName, u.PESEL
-    FROM [User] u
+    SELECT u.FirstName AgentFirstName, u.LastName AgentLastName, t.Status_ID,
+        c.PESEL, c.FirstName + ' ' + c.LastName ClientName, p.Premium
+    FROM Task t
+    LEFT JOIN [Policy] p ON t.Policy_ID = p.ID
+    LEFT JOIN [User] u ON t.Operator_ID = u.ID
+    LEFT JOIN [User] c ON p.Client_ID = c.ID
     WHERE u.Character_ID = 'AGENT'
-    GROUP BY u.ID, u.FirstName, u.LastName, u.PESEL;
 GO

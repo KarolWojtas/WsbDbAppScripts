@@ -114,12 +114,20 @@ GO
 CREATE FUNCTION CALC_VEHICLE_PREMIUM(@pesel VARCHAR(11), @insurancePeriod int, @su money, @vehicleModelId bigint, @mileage int, @frequency int = 12)
 RETURNS MONEY
 BEGIN
-    DECLARE @age int, @vehicleAge int, @additionalPremium money = 0;
+    DECLARE @age int, @vehicleAge int, @horsepower int, @horsepowerMultiplier decimal = 0, @additionalPremium money = 0;
     SET @vehicleAge = DATEDIFF(YEAR, (SELECT Year FROM VehicleModel WHERE ID = @vehicleModelId), GETDATE());
     SET @age = DATEDIFF(YEAR, dbo.BIRTHDATE_FROM_PESEL(@pesel), GETDATE());
+    SET @horsepower = (SELECT Horsepower FROM VehicleModel WHERE ID = @vehicleModelId);
     IF @age < 25
         SET @additionalPremium = 0.5 * ((25 - @age) * 0.1) * @su;
-    SET @additionalPremium = @additionalPremium + @su * 0.01 * @vehicleAge;
+    IF @horsepower BETWEEN 0 AND 80
+        SET @horsepowerMultiplier = 0.01
+    ELSE IF @horsepower BETWEEN 81 and 140
+        SET @horsepowerMultiplier = 0.02
+    ELSE 
+        SET @horsepowerMultiplier = 0.03
+    SET @additionalPremium = @additionalPremium + (@su * 0.01 * @vehicleAge);
+    SET @additionalPremium = @additionalPremium + (@su * @horsepowerMultiplier);
     RETURN dbo.CALC_BASE_PREMIUM(@su + @additionalPremium, @insurancePeriod, @frequency);
 END
 GO
