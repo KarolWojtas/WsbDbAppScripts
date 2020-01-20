@@ -148,3 +148,31 @@ BEGIN
     RETURN @randomCentralId;
 END
 GO
+DROP FUNCTION CLIENT_POLICY_COUNT
+GO
+CREATE FUNCTION CLIENT_POLICY_COUNT(@clientId bigint, @type varchar(30))
+RETURNS int
+BEGIN
+    DECLARE @count int = 0;
+    IF @type  IN ('APPROVED', 'SENT_TO_CLIENT')
+        SET @count = (
+            SELECT COUNT(t.ID) FROM Task t
+            LEFT JOIN [Policy] p ON t.Policy_ID = p.ID
+            WHERE p.Client_ID = @clientId AND t.Status_ID IN ('APPROVED', 'SENT_TO_CLIENT')
+            GROUP BY p.Client_ID
+            )
+    ELSE IF @type = 'NOT_APPROVED'
+        SET @count = (
+            SELECT COUNT(t.ID) FROM Task t
+            LEFT JOIN [Policy] p ON t.Policy_ID = p.ID
+            WHERE p.Client_ID = @clientId AND t.Status_ID = 'NOT_APPROVED'
+            GROUP BY p.Client_ID
+            )
+    ELSE IF @type = 'CALCULATION'
+        SET @count = (
+            SELECT COUNT(p.ID) FROM [Policy] p
+            GROUP BY p.Client_ID, p.ID
+            HAVING p.ID NOT IN (SELECT Policy_ID FROM Task t ) AND p.Client_ID = @clientId
+        )
+    RETURN @count
+END

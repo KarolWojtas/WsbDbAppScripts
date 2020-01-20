@@ -35,3 +35,22 @@ AS
     LEFT JOIN [User] c ON p.Client_ID = c.ID
     WHERE a.Character_ID = 'AGENT'
 GO
+-- todo widok dla centrali z zadaniami, opisem ryzyk i liczbą zatw/kalk/niezatw polis klienta
+DROP VIEW CENTRAL_TASK_SUMMARY
+GO
+CREATE VIEW CENTRAL_TASK_SUMMARY
+AS
+    SELECT 
+    central.ID CentralID, central.FirstName + ' ' + central.LastName CentralName,
+    t.UpdateDatetime, DATEDIFF(DAY, GETDATE(), p.StartDate) as DaysBeforePolicyStart,
+    p.Premium PolicyPremium,
+    client.ID ClientID, client.PESEL ClientPesel, client.FirstName + ' ' + client.LastName ClientName,
+    ISNULL(dbo.CLIENT_POLICY_COUNT(client.ID, 'APPROVED'), 0) ClientPoliciesApproved,
+    ISNULL(dbo.CLIENT_POLICY_COUNT(client.ID, 'NOT_APPROVED'), 0) ClientPoliciesNotApproved,
+    ISNULL(dbo.CLIENT_POLICY_COUNT(client.ID, 'CALCULATION'), 0) ClientPoliciesDuringCalculation
+    FROM Task t
+    LEFT JOIN [Policy] p ON p.ID = t.Policy_ID
+    LEFT JOIN [User] central ON central.ID = t.Operator_ID
+    LEFT JOIN [User] client ON client.ID = p.Client_ID
+    WHERE central.Character_ID = 'CENTRAL'
+GO
