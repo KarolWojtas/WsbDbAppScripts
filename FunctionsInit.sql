@@ -129,12 +129,11 @@ CREATE FUNCTION LEAST_BUSY_CENTRAL()
 RETURNS bigint
 BEGIN
     DECLARE @minTaskNumber int = (SELECT MIN(NumberOfTasks) FROM CENTRAL_TASKS);
-    DECLARE @randomCentralId int;
-    SET @randomCentralId = (
+    DECLARE @chosenCentralId int;
+    SET @chosenCentralId = (
         SELECT TOP 1 Central_ID FROM CENTRAL_TASKS 
         WHERE NumberOfTasks = @minTaskNumber);
-        -- todo maybe random but it is tricky
-    RETURN @randomCentralId;
+    RETURN @chosenCentralId;
 END
 GO
 DROP FUNCTION CLIENT_POLICY_COUNT

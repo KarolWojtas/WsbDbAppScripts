@@ -35,7 +35,6 @@ AS
     LEFT JOIN [User] c ON p.Client_ID = c.ID
     WHERE a.Character_ID = 'AGENT'
 GO
--- todo widok dla centrali z zadaniami, opisem ryzyk i liczbą zatw/kalk/niezatw polis klienta
 DROP VIEW CENTRAL_TASK_SUMMARY
 GO
 CREATE VIEW CENTRAL_TASK_SUMMARY
