@@ -6,13 +6,13 @@ GO
 -- LifeRisk (@pesel VARCHAR(11), @insurancePeriod int, @su money, @hazardousOccupation bit, @frequency int = 12)
 CREATE TRIGGER INSERT_LIFE_PREMIUM
 ON LifeRisk
-AFTER INSERT
+AFTER INSERT, UPDATE
 AS 
 BEGIN
     UPDATE LifeRisk 
     SET Premium = InsuranceCompany.dbo.CALC_LIFE_PREMIUM(
-        [User].PESEL,
-        DATEDIFF(YEAR, [Policy].StartDate, [Policy].EndDate),
+        u.PESEL,
+        DATEDIFF(YEAR, p.StartDate, p.EndDate),
         inserted.SU,
         inserted.HazardousOccupation, 
         DEFAULT
@@ -20,10 +20,10 @@ BEGIN
     FROM LifeRisk
     LEFT OUTER JOIN inserted
     ON LifeRisk.ID = inserted.ID
-    LEFT OUTER JOIN [Policy]
-    ON [Policy].ID = inserted.ID
-    LEFT OUTER JOIN [User]
-    ON [User].ID = [Policy].Client_ID
+    LEFT OUTER JOIN [dbo].[Policy] p
+    ON p.ID = inserted.Policy_ID
+    LEFT OUTER JOIN [dbo].[User] u
+    ON u.ID = p.Client_ID
     WHERE LifeRisk.ID IN (SELECT ID FROM inserted)
 END
 GO
@@ -67,8 +67,8 @@ AS
 BEGIN
     UPDATE VehicleRisk 
     SET Premium = InsuranceCompany.dbo.CALC_VEHICLE_PREMIUM(
-        [User].PESEL,
-        DATEDIFF(YEAR, [Policy].StartDate, [Policy].EndDate),
+        u.PESEL,
+        DATEDIFF(YEAR, p.StartDate, p.EndDate),
         inserted.SU,
         inserted.VehicleModel_ID,
         inserted.Mileage,
@@ -77,10 +77,10 @@ BEGIN
     FROM VehicleRisk
     LEFT OUTER JOIN inserted
     ON VehicleRisk.ID = inserted.ID
-    LEFT OUTER JOIN [Policy]
-    ON [Policy].ID = inserted.Policy_ID
-    LEFT OUTER JOIN [User]
-    ON [User].ID = [Policy].Client_ID
+    LEFT OUTER JOIN [dbo].[Policy] p
+    ON p.ID = inserted.Policy_ID
+    LEFT OUTER JOIN [dbo].[User] u
+    ON u.ID = p.Client_ID
     WHERE VehicleRisk.ID IN (SELECT ID FROM inserted)
 END
 GO

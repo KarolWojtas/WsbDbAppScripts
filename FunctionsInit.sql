@@ -29,17 +29,6 @@ BEGIN
     RETURN FLOOR((SELECT RANDOM_NUMBER FROM RANDOM_NUMBER_VIEW)*(@from - @to + 1) + @to)
 END
 GO
--- Random Year used in VehicleModel
-DROP FUNCTION RANDOM_YEAR
-GO
-CREATE FUNCTION RANDOM_YEAR(@begin int, @end int)
-RETURNS DATE
-BEGIN
-    DECLARE @numberYear int;
-    SET @numberYear = dbo.RANDOM_NUMBER(@begin, @end)
-    RETURN CAST( CONCAT('1/1/', @numberYear) as [date])
-END
-GO
 -- BirthDateFromPesel
 DROP FUNCTION BIRTHDATE_FROM_PESEL
 GO
@@ -51,17 +40,17 @@ BEGIN
     IF @monthNum > 12
         BEGIN
             SET @yearPref = '20';
-            SET @monthStr = CAST(@monthNum - 20 as varchar(2));
+            SET @monthStr = FORMAT(@monthNum - 20,'D2');
         END
     ELSE 
         BEGIN
             SET @yearPref = '19';
-            SET @monthStr = CAST(@monthNum as varchar(2));
+            SET @monthStr = FORMAT(@monthNum,'D2');
         END
     SET @dayStr = SUBSTRING(@pesel, 5, 2);
     SET @yearStr = CONCAT(@yearPref, SUBSTRING(@pesel, 1, 2));
     DECLARE @resultStr VARCHAR(20);
-    SET @resultStr = CONCAT_WS('/', @monthStr, @dayStr, @yearStr);
+    SET @resultStr = CONCAT(@yearStr, @monthStr, @dayStr);
     RETURN CAST( @resultStr AS DATE);
 END
 GO

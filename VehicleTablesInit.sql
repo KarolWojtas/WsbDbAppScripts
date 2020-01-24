@@ -1414,7 +1414,3 @@ BEGIN
     (71, 'GVX', 'GVX', 296, '1991-01-01'),
     (71, 'YUOTH', 'Other Yugo Models', 191, '2016-01-01');
 END
--- Randomize Year and Horsepower (to much work to search manually)
--- UPDATE VehicleModel
--- SET [Year] = dbo.RANDOM_YEAR(1980, 2019), Horsepower = dbo.RANDOM_NUMBER(300, 80)
--- WHERE ID IS NOT NULL;
